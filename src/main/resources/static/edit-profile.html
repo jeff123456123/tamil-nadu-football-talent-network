@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+</head>
+<body>
+
+<h1>Edit Profile</h1>
+
+<input id="height" placeholder="Height">
+<input id="weight" placeholder="Weight">
+<input id="position" placeholder="Position">
+
+<button onclick="updateProfile()">Save</button>
+
+<script>
+async function updateProfile() {
+
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const response = await fetch(
+        '/api/players/user/' + user.id
+    );
+
+    const player = await response.json();
+
+    await fetch('/api/players/' + player.id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            height: document.getElementById('height').value,
+            weight: document.getElementById('weight').value,
+            position: document.getElementById('position').value,
+            active: true
+        })
+    });
+
+    alert('Profile Updated');
+}
+</script>
+
+</body>
+</html>

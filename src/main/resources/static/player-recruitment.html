@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Recruitment Requests</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<div id="toast" class="toast"></div>
+
+<h1>⚽ Recruitment Requests</h1>
+
+<div id="requests"></div>
+
+<br>
+
+<button onclick="window.location.href='/player-dashboard.html'">
+
+    Back To Dashboard
+
+</button>
+
+<script>
+
+async function loadRequests() {
+
+    const user =
+        JSON.parse(localStorage.getItem('user'));
+
+    const playerResponse =
+        await fetch('/api/players/user/' + user.id);
+
+    const player =
+        await playerResponse.json();
+
+    const response =
+        await fetch(
+            '/api/recruitment/player/' + player.id
+        );
+
+    const requests =
+        await response.json();
+
+    let html = '';
+
+    requests.forEach(request => {
+
+        html += `
+
+        <div class="card">
+
+            <h2>
+
+                Recruitment Offer
+
+            </h2>
+
+            <p>
+
+                <b>Scout:</b>
+
+                ${request.scout.user.firstName}
+
+                ${request.scout.user.lastName}
+
+            </p>
+
+            <p>
+
+                <b>Status:</b>
+
+                ${request.status}
+
+            </p>
+
+            ${request.status === 'PENDING'
+            ?
+
+            `
+
+            <button
+                onclick="updateRequest(
+                    ${request.id},
+                    'ACCEPTED')">
+
+                Accept
+
+            </button>
+
+            <button
+                onclick="updateRequest(
+                    ${request.id},
+                    'REJECTED')">
+
+                Reject
+
+            </button>
+
+            `
+
+            :
+
+            ''
+            }
+
+        </div>
+
+        `;
+    });
+
+    if(requests.length === 0) {
+
+        html = `
+
+        <div class="card">
+
+            <h2>No Recruitment Requests Yet</h2>
+
+        </div>
+
+        `;
+    }
+
+    document.getElementById('requests')
+        .innerHTML = html;
+}
+
+async function updateRequest(id,status) {
+
+    const response =
+        await fetch(
+
+            '/api/recruitment/' +
+            id + '/' + status,
+
+            {
+                method:'PUT'
+            }
+
+        );
+
+    if(response.ok) {
+
+        showToast(
+            'Request Updated');
+
+        loadRequests();
+
+    } else {
+
+        showToast(
+            'Failed');
+    }
+}
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById('toast');
+
+    toast.innerText = message;
+
+    toast.style.display = 'block';
+
+    setTimeout(() => {
+
+        toast.style.display = 'none';
+
+    },3000);
+}
+
+loadRequests();
+
+</script>
+
+</body>
+
+</html>

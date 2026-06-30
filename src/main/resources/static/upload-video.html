@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Upload Video</title>
+</head>
+<body>
+
+<h1>Upload Video</h1>
+
+<input id="title" placeholder="Video Title">
+
+<br><br>
+
+<input id="fileUrl" placeholder="YouTube URL">
+
+<br><br>
+
+<textarea id="description" placeholder="Description"></textarea>
+
+<br><br>
+
+<button onclick="uploadVideo()">Upload</button>
+
+<script>
+
+async function uploadVideo() {
+
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const playerResponse =
+        await fetch('/api/players/user/' + user.id);
+
+    const player =
+        await playerResponse.json();
+
+    const response = await fetch('/api/videos', {
+
+        method: 'POST',
+
+        headers: {
+            'Content-Type': 'application/json'
+        },
+
+        body: JSON.stringify({
+
+            title:
+                document.getElementById('title').value,
+
+            fileUrl:
+                document.getElementById('fileUrl').value,
+
+            description:
+                document.getElementById('description').value,
+
+            player: {
+                id: player.id
+            },
+
+            uploadedBy: {
+                id: user.id
+            }
+
+        })
+    });
+
+    if(response.ok) {
+        alert('Video Uploaded');
+    } else {
+        alert('Upload Failed');
+    }
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Player Dashboard</title>
+
+    <link rel="stylesheet" href="/style.css?v=2">
+
+    <style>
+
+        .dashboard-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .dashboard-buttons button {
+            margin: 10px;
+        }
+
+        .welcome-card {
+            text-align: center;
+        }
+
+        .profile-details p {
+            font-size: 18px;
+            margin: 15px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #aiAnalysis {
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h1>Player Dashboard</h1>
+
+
+<div class="card welcome-card">
+
+    <h2 id="name"></h2>
+
+    <p id="email"></p>
+
+    <p id="role"></p>
+
+</div>
+
+<div class="card">
+
+    <h2 class="section-title">
+        Player Profile
+    </h2>
+
+    <div class="profile-details">
+
+        <p id="district"></p>
+
+        <p id="level"></p>
+
+        <p id="position"></p>
+
+        <p id="height"></p>
+
+        <p id="weight"></p>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <h2 class="section-title">
+        🤖 AI Player Analysis
+    </h2>
+
+    <div id="aiAnalysis">
+        Loading analysis...
+    </div>
+
+</div>
+
+<div class="dashboard-buttons">
+    <div class="card">
+
+    <h2 class="section-title">
+        Player Statistics
+    </h2>
+
+    <p>
+        <b>Total Videos Uploaded:</b>
+        <span id="videoCount">0</span>
+    </p>
+
+</div>
+
+    <button onclick="window.location.href='/edit-profile.html'">
+        Edit Profile
+    </button>
+
+    <button onclick="window.location.href='/upload-video.html'">
+        Upload Video
+    </button>
+
+    <button onclick="window.location.href='/my-videos.html'">
+        My Videos
+    </button>
+
+    <button onclick="window.location.href='/player-recruitment.html'">
+
+    Recruitment Requests
+
+</button>
+
+<button onclick="logout()">
+
+    Logout
+
+</button>
+
+</div>
+
+<script>
+
+const user = JSON.parse(localStorage.getItem('user'));
+
+async function loadPlayer() {
+    
+
+    try {
+
+        document.getElementById('name').innerText =
+            user.firstName + ' ' + user.lastName;
+
+        document.getElementById('email').innerHTML =
+            '<b>Email:</b> ' + user.email;
+
+        document.getElementById('role').innerHTML =
+            '<b>Role:</b> ' + user.role;
+
+        const response =
+            await fetch('/api/players/user/' + user.id);
+
+        const player =
+            await response.json();
+            const videosResponse =
+    await fetch('/api/videos');
+
+const videos =
+    await videosResponse.json();
+
+const myVideos =
+    videos.filter(v =>
+        v.player.id === player.id);
+
+document.getElementById('videoCount')
+    .innerText = myVideos.length;
+
+        document.getElementById('district').innerHTML =
+            '<b>District:</b> ' +
+            player.district.name;
+
+        document.getElementById('level').innerHTML =
+            '<b>Level:</b> ' +
+            player.playerLevel.level;
+
+        document.getElementById('position').innerHTML =
+            '<b>Position:</b> ' +
+            player.position;
+
+        document.getElementById('height').innerHTML =
+            '<b>Height:</b> ' +
+            player.height + ' cm';
+
+        document.getElementById('weight').innerHTML =
+            '<b>Weight:</b> ' +
+            player.weight + ' kg';
+
+
+        // AI ANALYSIS
+
+        let score = 5;
+        let analysis = '';
+
+        const position =
+            player.position.toLowerCase();
+
+        if(position === 'goalkeeper') {
+
+            if(player.height >= 185) {
+
+                score = 9;
+
+                analysis =
+                    'Excellent height for a goalkeeper. Strong aerial presence expected.';
+
+            } else {
+
+                score = 7;
+
+                analysis =
+                    'Good goalkeeper profile. Improve reflexes and jumping ability.';
+            }
+        }
+
+        else if(position === 'midfielder') {
+
+            if(player.height >= 180) {
+
+                score = 8;
+
+                analysis =
+                    'Strong physical midfielder profile. Focus on passing and stamina.';
+
+            } else {
+
+                score = 7;
+
+                analysis =
+                    'Creative midfielder profile. Improve vision and ball control.';
+            }
+        }
+
+        else if(position === 'striker') {
+
+            score = 8;
+
+            analysis =
+                'Promising striker profile. Improve finishing and positioning.';
+        }
+
+        else if(position === 'defender') {
+
+            if(player.height >= 180) {
+
+                score = 8;
+
+                analysis =
+                    'Excellent defensive build. Focus on tackling and marking.';
+
+            } else {
+
+                score = 7;
+
+                analysis =
+                    'Defender profile with good mobility. Improve strength.';
+            }
+        }
+
+        document.getElementById('aiAnalysis').innerHTML =
+
+            `
+            <h3>Potential Score: ${score}/10</h3>
+
+            <p>${analysis}</p>
+
+            <br>
+
+            <p>
+
+            <b>Recommended Training:</b>
+
+            <br><br>
+
+            ✔ Stamina
+
+            <br>
+
+            ✔ Technical Skills
+
+            <br>
+
+            ✔ Match Awareness
+
+            </p>
+            `;
+
+    }
+
+    catch(error) {
+
+        console.error(error);
+
+        document.getElementById('aiAnalysis').innerHTML =
+            'Failed to load AI analysis.';
+    }
+}
+
+loadPlayer();
+
+function logout() {
+
+    localStorage.removeItem('token');
+
+    localStorage.removeItem('user');
+
+    window.location.href = '/index.html';
+}
+
+</script>
+
+</body>
+</html>

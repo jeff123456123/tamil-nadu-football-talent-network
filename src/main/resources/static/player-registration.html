@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Registration - Tamil Nadu Football Talent Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .registration-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-section-title {
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group small {
+            color: #999;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        
+        .register-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+        
+        .register-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <div class="logo">
+            <h1>⚽ TN Football</h1>
+            <p>Player Registration</p>
+        </div>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        
+        <form id="registrationForm">
+            <!-- Account Section -->
+            <div class="form-section-title">Account Information</div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" id="firstName" name="firstName" placeholder="Enter first name" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" id="lastName" name="lastName" placeholder="Enter last name" required>
+                </div>
+            </div>
+            
+            <div class="form-row full">
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
+                    <small>Minimum 8 characters</small>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password *</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                </div>
+            </div>
+            
+            <!-- Player Section -->
+            <div class="form-section-title">Player Profile</div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dateOfBirth">Date of Birth *</label>
+                    <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                </div>
+                <div class="form-group">
+                    <label for="position">Position *</label>
+                    <select id="position" name="position" required>
+                        <option value="">Select position</option>
+                        <option value="Goalkeeper">Goalkeeper</option>
+                        <option value="Defender">Defender</option>
+                        <option value="Midfielder">Midfielder</option>
+                        <option value="Forward">Forward</option>
+                        <option value="Striker">Striker</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="height">Height (cm)</label>
+                    <input type="number" id="height" name="height" placeholder="e.g., 180" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Weight (kg)</label>
+                    <input type="number" id="weight" name="weight" placeholder="e.g., 75" step="0.1">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="district">District *</label>
+                    <select id="district" name="district" required>
+    <option value="">Select district</option>
+    <option value="1">Chennai</option>
+    <option value="2">Coimbatore</option>
+    <option value="3">Madurai</option>
+    <option value="4">Salem</option>
+    <option value="5">Tiruchirappalli</option>
+</select>
+                </div>
+                <div class="form-group">
+                    <label for="playerLevel">Current Level *</label>
+                    <select id="playerLevel" name="playerLevel" required>
+                        <option value="">Select level</option>
+                        <option value="1">Street</option>
+                        <option value="2">School</option>
+                        <option value="3">College</option>
+                        <option value="4">District</option>
+                        <option value="5">Academy</option>
+                        <option value="6">League</option>
+                        <option value="7">Division</option>
+                        <option value="8">State</option>
+                        <option value="9">Professional</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" class="register-btn">Create Account</button>
+        </form>
+        
+        <div class="login-link">
+            <a href="/index.html"></a>
+        </div>
+    </div>
+    
+    <script>
+        const registrationForm = document.getElementById('registrationForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        
+        registrationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            const height = document.getElementById('height').value;
+            const weight = document.getElementById('weight').value;
+            const position = document.getElementById('position').value;
+            const district = document.getElementById('district').value;
+            const playerLevel = document.getElementById('playerLevel').value;
+            
+            // Validation
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 8) {
+                showError('Password must be at least 8 characters');
+                return;
+            }
+            
+            try {
+                // Create user first
+                const userResponse = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        firstName: firstName,
+                        lastName: lastName,
+                        role: 'PLAYER',
+                        active: true
+                    })
+                });
+                
+                if (!userResponse.ok) {
+                    showError('Failed to create user account');
+                    return;
+                }
+                
+                const user = await userResponse.json();
+                
+                // Create player profile
+                const playerResponse = await fetch('/api/players', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user: { id: user.id },
+                        district: { id: district },
+                        playerLevel: { id: playerLevel },
+                        dateOfBirth: dateOfBirth,
+                        height: height ? parseFloat(height) : null,
+                        weight: weight ? parseFloat(weight) : null,
+                        position: position,
+                        active: true
+                    })
+                });
+                
+                if (playerResponse.ok) {
+                    showSuccess('Account created successfully! Redirecting to login...');
+                    setTimeout(() => {
+                       window.location.href = '/index.html';
+                    }, 2000);
+                } else {
+                    showError('Failed to create player profile');
+                }
+            } catch (error) {
+                showError('Error creating account. Please try again.');
+            }
+        });
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

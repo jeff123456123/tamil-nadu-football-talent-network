@@ -1,0 +1,9 @@
+﻿target/
+*.class
+.idea/
+*.iml
+compile_output.txt
+error.txt
+*.log
+.DS_Store
+Thumbs.db

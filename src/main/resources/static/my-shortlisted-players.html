@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>My Shortlisted Players</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+
+        .analytics-grid {
+
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+            gap: 15px;
+        }
+
+        .stat-box {
+
+            background: #eff6ff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 5px solid #2563eb;
+        }
+
+        .stat-box h3 {
+
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .player-card {
+
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+
+            display: block;
+            margin: 30px auto;
+        }
+
+        .toast {
+
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #16a34a;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 1000;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div id="toast" class="toast"></div>
+
+<h1>⭐ My Shortlisted Players</h1>
+
+<!-- ANALYTICS -->
+
+<div class="card">
+
+    <h2>📊 Scout Analytics</h2>
+
+    <div class="analytics-grid">
+
+        <div class="stat-box">
+            <h3>Total</h3>
+            <p id="totalCount">0</p>
+        </div>
+
+        <div class="stat-box">
+            <h3>Goalkeepers</h3>
+            <p id="goalkeeperCount">0</p>
+        </div>
+
+        <div class="stat-box">
+            <h3>Defenders</h3>
+            <p id="defenderCount">0</p>
+        </div>
+
+        <div class="stat-box">
+            <h3>Midfielders</h3>
+            <p id="midfielderCount">0</p>
+        </div>
+
+        <div class="stat-box">
+            <h3>Strikers</h3>
+            <p id="strikerCount">0</p>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="players"></div>
+
+<button
+        class="back-btn"
+        onclick="window.location.href='/scout-dashboard.html'">
+
+    Back To Dashboard
+
+</button>
+
+<script>
+
+async function loadShortlistedPlayers() {
+
+    const user =
+        JSON.parse(localStorage.getItem('user'));
+
+    const scoutResponse =
+        await fetch('/api/scouts/user/' + user.id);
+
+    const scout =
+        await scoutResponse.json();
+
+    const shortlistResponse =
+        await fetch('/api/shortlists/scout/' + scout.id);
+
+    const shortlistedPlayers =
+        await shortlistResponse.json();
+
+    // ANALYTICS
+
+    document.getElementById('totalCount')
+        .innerText = shortlistedPlayers.length;
+
+    let gk = 0;
+    let def = 0;
+    let mid = 0;
+    let st = 0;
+
+    shortlistedPlayers.forEach(item => {
+
+        const pos =
+            item.player.position.toLowerCase();
+
+        if(pos.includes('goal'))
+            gk++;
+
+        else if(pos.includes('def'))
+            def++;
+
+        else if(pos.includes('mid'))
+            mid++;
+
+        else if(pos.includes('str'))
+            st++;
+    });
+
+    document.getElementById('goalkeeperCount')
+        .innerText = gk;
+
+    document.getElementById('defenderCount')
+        .innerText = def;
+
+    document.getElementById('midfielderCount')
+        .innerText = mid;
+
+    document.getElementById('strikerCount')
+        .innerText = st;
+
+    // PLAYER CARDS
+
+    let html = '';
+
+    shortlistedPlayers.forEach(item => {
+
+        const player = item.player;
+
+        html += `
+
+        <div class="card player-card">
+
+            <h2>
+
+                ${player.user.firstName}
+                ${player.user.lastName}
+
+            </h2>
+
+            <p>
+
+                <b>Position:</b>
+                ${player.position}
+
+            </p>
+
+            <p>
+
+                <b>District:</b>
+                ${player.district.name}
+
+            </p>
+
+            <p>
+
+                <b>Height:</b>
+                ${player.height} cm
+
+            </p>
+
+            <p>
+
+                <b>Weight:</b>
+                ${player.weight} kg
+
+            </p>
+
+            <button
+                onclick="removeShortlist(${item.id})">
+
+                Remove From Shortlist
+
+            </button>
+
+        </div>
+
+        `;
+    });
+
+    if(shortlistedPlayers.length === 0) {
+
+        html = `
+
+        <div class="card">
+
+            <h2>No Players Shortlisted Yet</h2>
+
+        </div>
+
+        `;
+    }
+
+    document.getElementById('players')
+        .innerHTML = html;
+}
+
+async function removeShortlist(id) {
+
+    const response =
+        await fetch('/api/shortlists/' + id, {
+
+            method: 'DELETE'
+        });
+
+    if(response.ok) {
+
+        showToast(
+            'Player Removed Successfully');
+
+        setTimeout(() => {
+
+            location.reload();
+
+        },1000);
+
+    } else {
+
+        showToast(
+            'Failed To Remove Player');
+    }
+}
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById('toast');
+
+    toast.innerText = message;
+
+    toast.style.display = 'block';
+
+    setTimeout(() => {
+
+        toast.style.display = 'none';
+
+    },3000);
+}
+
+loadShortlistedPlayers();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Scout Dashboard</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+<div id="toast" class="toast"></div>
+
+<h1>Scout Dashboard</h1>
+
+<button onclick="window.location.href='/my-shortlisted-players.html'">
+
+    My Shortlisted Players
+
+</button>
+
+<br><br>
+
+<div class="card">
+
+    <h2>📊 Scout Statistics</h2>
+
+    <p id="totalPlayers"></p>
+
+    <p id="totalVideos"></p>
+
+    <p id="totalShortlisted"></p>
+
+</div>
+
+<div class="card">
+
+    <h2>🏆 Top Talents</h2>
+
+    <div id="topTalents">
+
+        Loading...
+
+    </div>
+
+</div>
+
+<input
+        type="text"
+        id="searchBox"
+        placeholder="Search by Position..."
+        onkeyup="loadVideos()">
+
+<br><br>
+
+<input
+        type="text"
+        id="districtSearch"
+        placeholder="Search by District..."
+        onkeyup="loadVideos()">
+
+<br><br>
+
+<div id="videos"></div>
+
+<script>
+
+async function loadVideos() {
+
+    const response =
+        await fetch('/api/videos');
+
+    const videos =
+        await response.json();
+
+    const search =
+        document.getElementById('searchBox')
+            .value.toLowerCase() || '';
+
+    const districtSearch =
+        document.getElementById('districtSearch')
+            .value.toLowerCase() || '';
+
+    document.getElementById('totalVideos')
+        .innerHTML =
+        '<b>Total Videos:</b> ' + videos.length;
+
+    document.getElementById('totalPlayers')
+        .innerHTML =
+        '<b>Total Players:</b> ' + videos.length;
+
+    // TOP TALENTS
+
+    let topPlayers =
+        [...videos]
+            .sort((a,b) =>
+                b.player.height - a.player.height)
+            .slice(0,3);
+
+    let topHtml = '';
+
+    topPlayers.forEach(video => {
+
+        topHtml += `
+
+        <p>
+
+            ⭐
+
+            ${video.player.user.firstName}
+
+            ${video.player.user.lastName}
+
+            (${video.player.position})
+
+            - ${video.player.height} cm
+
+        </p>
+
+        `;
+    });
+
+    document.getElementById('topTalents')
+        .innerHTML = topHtml;
+
+    let html = '';
+
+    for(const video of videos) {
+
+        const position =
+            video.player.position.toLowerCase();
+
+        const district =
+            video.player.district.name.toLowerCase();
+
+        if(
+            !position.includes(search) ||
+            !district.includes(districtSearch)
+        ) {
+            continue;
+        }
+
+        let aiText =
+            'AI unavailable';
+
+        try {
+
+            const aiResponse =
+                await fetch('/api/ai/analyze', {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({
+
+                        position: video.player.position,
+                        height: video.player.height,
+                        weight: video.player.weight
+
+                    })
+                });
+
+            if(aiResponse.ok) {
+
+                aiText =
+                    await aiResponse.text();
+            }
+
+        } catch(error) {
+
+            console.log(error);
+        }
+
+        html += `
+
+        <div class="card">
+
+            <h2>${video.title}</h2>
+
+            <p>${video.description}</p>
+
+            <p>
+
+                <b>Player:</b>
+
+                ${video.player.user.firstName}
+
+                ${video.player.user.lastName}
+
+            </p>
+
+            <p>
+
+                <b>Position:</b>
+
+                ${video.player.position}
+
+            </p>
+
+            <p>
+
+                <b>District:</b>
+
+                ${video.player.district.name}
+
+            </p>
+
+            <p>
+
+                <b>Height:</b>
+
+                ${video.player.height} cm
+
+            </p>
+
+            <p>
+
+                <b>Weight:</b>
+
+                ${video.player.weight} kg
+
+            </p>
+
+            <p>
+
+                <b>🤖 AI Analysis:</b>
+
+            </p>
+
+            <p>
+
+                ${aiText}
+
+            </p>
+
+            <a href="${video.fileUrl}"
+               target="_blank">
+
+                Watch Video
+
+            </a>
+
+            <br><br>
+
+            <button
+                onclick="shortlistPlayer(${video.player.id})">
+
+                Shortlist Player
+
+            </button>
+
+            <button
+                onclick="sendRecruitmentRequest(${video.player.id})">
+
+                Send Recruitment Request
+
+            </button>
+
+        </div>
+
+        `;
+    }
+
+    document.getElementById('videos')
+        .innerHTML = html;
+}
+
+loadVideos();
+
+async function sendRecruitmentRequest(playerId) {
+
+    const user =
+        JSON.parse(localStorage.getItem("user"));
+
+    const scoutResponse =
+        await fetch("/api/scouts/user/" + user.id);
+
+    const scout =
+        await scoutResponse.json();
+
+    const response =
+        await fetch("/api/recruitment", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                scout: {
+                    id: scout.id
+                },
+
+                player: {
+                    id: playerId
+                }
+
+            })
+
+        });
+
+    if(response.ok){
+
+        showToast("Recruitment Request Sent");
+
+    }else{
+
+        showToast("Failed To Send Request");
+
+    }
+
+}
+
+async function shortlistPlayer(playerId) {
+
+    const user =
+        JSON.parse(localStorage.getItem('user'));
+
+    const scoutResponse =
+        await fetch('/api/scouts/user/' + user.id);
+
+    const scout =
+        await scoutResponse.json();
+
+    const data = {
+
+        scout: {
+            id: scout.id
+        },
+
+        player: {
+            id: playerId
+        }
+    };
+
+    const response =
+        await fetch('/api/shortlists', {
+
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify(data)
+        });
+
+    if(response.ok) {
+
+        showToast(
+            'Player Shortlisted');
+
+        loadShortlistCount();
+
+    } else {
+
+        showToast(
+            'Shortlist Failed');
+    }
+}
+
+async function loadShortlistCount() {
+
+    try {
+
+        const user =
+            JSON.parse(localStorage.getItem('user'));
+
+        const scoutResponse =
+            await fetch('/api/scouts/user/' + user.id);
+
+        const scout =
+            await scoutResponse.json();
+
+        const response =
+            await fetch(
+                '/api/shortlists/scout/' + scout.id);
+
+        const players =
+            await response.json();
+
+        document.getElementById('totalShortlisted')
+            .innerHTML =
+            '<b>Shortlisted Players:</b> '
+            + players.length;
+
+    } catch(error) {
+
+        document.getElementById('totalShortlisted')
+            .innerHTML =
+            '<b>Shortlisted Players:</b> 0';
+    }
+}
+
+loadShortlistCount();
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById('toast');
+
+    toast.innerText = message;
+
+    toast.style.display = 'block';
+
+    setTimeout(() => {
+
+        toast.style.display = 'none';
+
+    },3000);
+}
+
+</script>
+
+</body>
+</html>
+

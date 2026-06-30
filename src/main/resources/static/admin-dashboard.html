@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" href="/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        .stats-grid {
+
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-left: 6px solid #2563eb;
+        }
+
+        .stat-card p {
+
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        canvas {
+
+            max-width: 700px;
+            margin: auto;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h1>⚙️ Admin Dashboard</h1>
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <h2>Total Players</h2>
+
+        <p id="playerCount">0</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <h2>Total Videos</h2>
+
+        <p id="videoCount">0</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <h2>Total Districts</h2>
+
+        <p id="districtCount">0</p>
+
+    </div>
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>Players By Position</h2>
+
+    <canvas id="positionChart"></canvas>
+
+</div>
+
+<br>
+
+<div class="card">
+
+    <h2>Players By District</h2>
+
+    <canvas id="districtChart"></canvas>
+
+</div>
+
+<br>
+
+<button onclick="logout()">
+
+    Logout
+
+</button>
+
+<script>
+
+async function loadDashboard() {
+
+    const playersResponse =
+        await fetch('/api/players');
+
+    const players =
+        await playersResponse.json();
+
+    document.getElementById('playerCount')
+        .innerText = players.length;
+
+
+    const videosResponse =
+        await fetch('/api/videos');
+
+    const videos =
+        await videosResponse.json();
+
+    document.getElementById('videoCount')
+        .innerText = videos.length;
+
+
+    // DISTRICT STATS
+
+    let districtMap = {};
+
+    players.forEach(player => {
+
+        let district =
+            player.district.name;
+
+        districtMap[district] =
+            (districtMap[district] || 0) + 1;
+    });
+
+    document.getElementById('districtCount')
+        .innerText =
+        Object.keys(districtMap).length;
+
+
+    // POSITION STATS
+
+    let positionMap = {};
+
+    players.forEach(player => {
+
+        let position =
+            player.position;
+
+        positionMap[position] =
+            (positionMap[position] || 0) + 1;
+    });
+
+
+    // PIE CHART
+
+    new Chart(
+
+        document.getElementById('positionChart'),
+
+        {
+
+            type: 'pie',
+
+            data: {
+
+                labels:
+                    Object.keys(positionMap),
+
+                datasets: [{
+
+                    data:
+                        Object.values(positionMap)
+
+                }]
+            }
+        }
+    );
+
+
+    // BAR CHART
+
+    new Chart(
+
+        document.getElementById('districtChart'),
+
+        {
+
+            type: 'bar',
+
+            data: {
+
+                labels:
+                    Object.keys(districtMap),
+
+                datasets: [{
+
+                    label: 'Players',
+
+                    data:
+                        Object.values(districtMap)
+
+                }]
+            }
+        }
+    );
+}
+
+loadDashboard();
+
+function logout() {
+
+    localStorage.removeItem('token');
+
+    localStorage.removeItem('user');
+
+    window.location.href =
+        '/index.html';
+}
+
+</script>
+
+</body>
+
+</html>

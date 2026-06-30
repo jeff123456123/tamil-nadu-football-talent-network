@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Dashboard - Tamil Nadu Football Talent Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .header-actions button,
+        .header-actions a {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .header-actions button:hover,
+        .header-actions a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: calc(100vh - 70px);
+        }
+        
+        .sidebar {
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 20px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .main-content {
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th {
+            background: #f0f0f0;
+            color: #333;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-buttons .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .empty-state p {
+            margin-bottom: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+        
+        .modal-header h2 {
+            color: #333;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚽ Club Dashboard</h1>
+        <div class="header-actions">
+            <span id="clubName">Club Name</span>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" class="menu-link active" data-section="overview">Overview</a></li>
+                <li><a href="#" class="menu-link" data-section="profile">Club Profile</a></li>
+                <li><a href="#" class="menu-link" data-section="players">Players</a></li>
+                <li><a href="#" class="menu-link" data-section="coaches">Coaches</a></li>
+                <li><a href="#" class="menu-link" data-section="trials">Trials</a></li>
+                <li><a href="#" class="menu-link" data-section="applications">Trial Applications</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <!-- Overview Section -->
+            <div id="overview" class="section active">
+                <div class="page-title">Dashboard Overview</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="playerCount">0</h3>
+                        <p>Total Players</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="coachCount">0</h3>
+                        <p>Total Coaches</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="trialCount">0</h3>
+                        <p>Active Trials</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="applicationCount">0</h3>
+                        <p>Trial Applications</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Club Profile Section -->
+            <div id="profile" class="section">
+                <div class="page-title">Club Profile</div>
+                <div class="card">
+                    <h2>Edit Club Information</h2>
+                    <form id="clubForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clubNameInput">Club Name</label>
+                                <input type="text" id="clubNameInput" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clubCity">City</label>
+                                <input type="text" id="clubCity" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clubDistrict">District</label>
+                                <select id="clubDistrict" required>
+                                    <option value="">Select district</option>
+                                    <option value="Chennai">Chennai</option>
+                                    <option value="Coimbatore">Coimbatore</option>
+                                    <option value="Madurai">Madurai</option>
+                                    <option value="Salem">Salem</option>
+                                    <option value="Trichy">Trichy</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="clubYear">Founded Year</label>
+                                <input type="number" id="clubYear" required>
+                            </div>
+                        </div>
+                        <div class="form-row full">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Players Section -->
+            <div id="players" class="section">
+                <div class="page-title">Club Players</div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h2>Player List</h2>
+                        <button class="btn btn-primary" onclick="openAddPlayerModal()">+ Add Player</button>
+                    </div>
+                    <div id="playersList">
+                        <div class="empty-state">
+                            <p>No players registered yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Coaches Section -->
+            <div id="coaches" class="section">
+                <div class="page-title">Club Coaches</div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h2>Coach List</h2>
+                        <button class="btn btn-primary" onclick="openAddCoachModal()">+ Add Coach</button>
+                    </div>
+                    <div id="coachesList">
+                        <div class="empty-state">
+                            <p>No coaches assigned yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trials Section -->
+            <div id="trials" class="section">
+                <div class="page-title">Club Trials</div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h2>Trial Postings</h2>
+                        <button class="btn btn-primary" onclick="openAddTrialModal()">+ Post Trial</button>
+                    </div>
+                    <div id="trialsList">
+                        <div class="empty-state">
+                            <p>No trials posted yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Trial Applications Section -->
+            <div id="applications" class="section">
+                <div class="page-title">Trial Applications</div>
+                <div class="card">
+                    <h2>Incoming Applications</h2>
+                    <div id="applicationsList">
+                        <div class="empty-state">
+                            <p>No applications received yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Player Modal -->
+    <div id="addPlayerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Player</h2>
+                <button class="close-btn" onclick="closeModal('addPlayerModal')">&times;</button>
+            </div>
+            <form id="addPlayerForm">
+                <div class="form-group">
+                    <label for="playerUserId">Player User ID</label>
+                    <input type="number" id="playerUserId" required>
+                </div>
+                <div class="form-group">
+                    <label for="playerPosition">Position</label>
+                    <select id="playerPosition" required>
+                        <option value="">Select position</option>
+                        <option value="Goalkeeper">Goalkeeper</option>
+                        <option value="Defender">Defender</option>
+                        <option value="Midfielder">Midfielder</option>
+                        <option value="Forward">Forward</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Add Player</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Add Coach Modal -->
+    <div id="addCoachModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Coach</h2>
+                <button class="close-btn" onclick="closeModal('addCoachModal')">&times;</button>
+            </div>
+            <form id="addCoachForm">
+                <div class="form-group">
+                    <label for="coachUserId">Coach User ID</label>
+                    <input type="number" id="coachUserId" required>
+                </div>
+                <div class="form-group">
+                    <label for="coachSpecialization">Specialization</label>
+                    <input type="text" id="coachSpecialization" placeholder="e.g., Defence, Midfield" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Add Coach</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Add Trial Modal -->
+    <div id="addTrialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Post Trial</h2>
+                <button class="close-btn" onclick="closeModal('addTrialModal')">&times;</button>
+            </div>
+            <form id="addTrialForm">
+                <div class="form-group">
+                    <label for="trialDate">Trial Date</label>
+                    <input type="date" id="trialDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="trialLocation">Location</label>
+                    <input type="text" id="trialLocation" required>
+                </div>
+                <div class="form-group">
+                    <label for="trialCapacity">Capacity</label>
+                    <input type="number" id="trialCapacity" required>
+                </div>
+                <div class="form-group">
+                    <label for="trialDescription">Description</label>
+                    <textarea id="trialDescription"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Post Trial</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let currentClubId = null;
+        
+        // Initialize dashboard
+        function init() {
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+            
+            if (!userStr || !token) {
+               window.location.href = '/index.html';
+                return;
+            }
+            
+            const user = JSON.parse(userStr);
+            document.getElementById('clubName').textContent = user.firstName + ' ' + user.lastName;
+            
+            // Load club data
+            loadClubData();
+            loadStats();
+            
+            // Setup menu
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = e.target.dataset.section;
+                    showSection(section);
+                });
+            });
+            
+            // Setup forms
+            document.getElementById('clubForm').addEventListener('submit', saveClub);
+            document.getElementById('addPlayerForm').addEventListener('submit', addPlayer);
+            document.getElementById('addCoachForm').addEventListener('submit', addCoach);
+            document.getElementById('addTrialForm').addEventListener('submit', addTrial);
+        }
+        
+        function getHeaders() {
+            const token = localStorage.getItem('token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            };
+        }
+        
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+            
+            if (sectionId === 'players') loadPlayers();
+            if (sectionId === 'coaches') loadCoaches();
+            if (sectionId === 'trials') loadTrials();
+            if (sectionId === 'applications') loadApplications();
+        }
+        
+        function loadClubData() {
+            // Sample club data
+            document.getElementById('clubNameInput').value = 'My Club';
+            document.getElementById('clubCity').value = 'Chennai';
+            document.getElementById('clubDistrict').value = 'Chennai';
+            document.getElementById('clubYear').value = 2015;
+        }
+        
+        function loadStats() {
+            document.getElementById('playerCount').textContent = '0';
+            document.getElementById('coachCount').textContent = '0';
+            document.getElementById('trialCount').textContent = '0';
+            document.getElementById('applicationCount').textContent = '0';
+        }
+        
+        function loadPlayers() {
+            document.getElementById('playersList').innerHTML = '<div class="empty-state"><p>No players found</p></div>';
+        }
+        
+        function loadCoaches() {
+            document.getElementById('coachesList').innerHTML = '<div class="empty-state"><p>No coaches found</p></div>';
+        }
+        
+        function loadTrials() {
+            document.getElementById('trialsList').innerHTML = '<div class="empty-state"><p>No trials found</p></div>';
+        }
+        
+        function loadApplications() {
+            document.getElementById('applicationsList').innerHTML = '<div class="empty-state"><p>No applications found</p></div>';
+        }
+        
+        function saveClub(e) {
+            e.preventDefault();
+            alert('Club information updated successfully!');
+        }
+        
+        function addPlayer(e) {
+            e.preventDefault();
+            alert('Player added successfully!');
+            closeModal('addPlayerModal');
+        }
+        
+        function addCoach(e) {
+            e.preventDefault();
+            alert('Coach added successfully!');
+            closeModal('addCoachModal');
+        }
+        
+        function addTrial(e) {
+            e.preventDefault();
+            alert('Trial posted successfully!');
+            closeModal('addTrialModal');
+        }
+        
+        function openAddPlayerModal() {
+            document.getElementById('addPlayerModal').classList.add('active');
+        }
+        
+        function openAddCoachModal() {
+            document.getElementById('addCoachModal').classList.add('active');
+        }
+        
+        function openAddTrialModal() {
+            document.getElementById('addTrialModal').classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '/index.html';
+        }
+        
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+        
+        init();
+    </script>
+</body>
+</html>

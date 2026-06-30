@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>My Videos</title>
+</head>
+<body>
+
+<h1>My Videos</h1>
+
+<div id="videos"></div>
+
+<br>
+
+<button onclick="window.location.href='/player-dashboard.html'">
+    Back
+</button>
+
+<script>
+
+async function loadVideos() {
+
+    try {
+
+        const user =
+            JSON.parse(localStorage.getItem('user'));
+
+        const playerResponse =
+            await fetch('/api/players/user/' + user.id);
+
+        const player =
+            await playerResponse.json();
+
+        const videoResponse =
+            await fetch('/api/videos/player/' + player.id);
+
+        const videos =
+            await videoResponse.json();
+
+        let html = '';
+
+        videos.forEach(video => {
+
+            html += `
+                <h3>${video.title}</h3>
+
+                <p>${video.description}</p>
+
+                <a href="${video.fileUrl}" target="_blank">
+                    Watch Video
+                </a>
+
+                <br><br>
+
+                <button onclick="deleteVideo(${video.id})">
+                    Delete
+                </button>
+
+                <hr>
+            `;
+        });
+
+        document.getElementById('videos').innerHTML =
+            html;
+
+    } catch(error) {
+
+        console.error(error);
+
+        alert('Error loading videos');
+    }
+}
+
+async function deleteVideo(id) {
+
+    const response = await fetch(
+        '/api/videos/' + id,
+        {
+            method: 'DELETE'
+        }
+    );
+
+    if(response.ok) {
+
+        alert('Video Deleted');
+
+        location.reload();
+
+    } else {
+
+        alert('Delete Failed');
+    }
+}
+
+loadVideos();
+
+</script>
+
+</body>
+</html>
