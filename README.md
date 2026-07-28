@@ -1,4 +1,26 @@
-# Tamil Nadu Football Talent Network - Setup Guide
+# Tamil Nadu Football Talent Network
+
+A full-stack web platform connecting young football players with scouts and clubs across Tamil Nadu, helping talented players get discovered.
+
+## Features
+- Player registration and profile management
+- Scout/club dashboard to browse trials and shortlist players
+- Role-based access control (Player / Scout / Club / Admin)
+- Secure authentication using JWT
+- Trial applications and video submissions
+
+## Tech Stack
+- **Backend:** Java, Spring Boot (Controller-Service-Repository architecture)
+- **Database:** MySQL
+- **Security:** Spring Security, JWT Authentication
+- **Frontend:** HTML, CSS, JavaScript
+
+## What I Learned
+This was my first end-to-end full-stack project built solo — from designing the database schema and REST APIs, to implementing authentication and role-based access, to building the frontend UI.
+
+---
+
+# Setup Guide
 
 ## Prerequisites
 - Java 17 or higher
@@ -40,8 +62,6 @@ The application will start on `http://localhost:8080`
 - **Club Dashboard:** `http://localhost:8080/club-dashboard.html`
 
 ## Project Structure
-
-```
 src/main/java/com/football/
 ├── FootballTalentNetworkApplication.java  (Main Application)
 ├── config/                                 (Configuration classes)
@@ -56,8 +76,6 @@ src/main/resources/
     ├── login.html
     ├── player-registration.html
     └── club-dashboard.html
-```
-
 ## API Documentation
 
 All APIs follow REST conventions on `/api/**` endpoints:
@@ -76,9 +94,9 @@ All APIs follow REST conventions on `/api/**` endpoints:
 
 1. **Port Already in Use:**
    Change port in `application.properties`:
-   ```properties
+```properties
    server.port=8081
-   ```
+```
 
 2. **Database Connection Error:**
    Ensure MySQL is running and credentials are correct
