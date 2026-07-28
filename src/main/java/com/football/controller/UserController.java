@@ -59,12 +59,6 @@ public class UserController {
         }
         return ResponseEntity.notFound().build();
     }
-    @PostMapping
-public ResponseEntity<User> createUser(@RequestBody User user) {
-
-    User savedUser = userRepository.save(user);
-    return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-}
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {

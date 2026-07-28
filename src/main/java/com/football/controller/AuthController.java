@@ -36,62 +36,45 @@ public class AuthController {
         if (user.getRole() == null) {
             user.setRole(User.UserRole.PLAYER);
         }
-        // Encode password before saving
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User registeredUser = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
     }
     
     @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-
-    Optional<User> user = userService.getUserByEmail(loginRequest.getEmail());
-
-    if (user.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse("Invalid email or password"));
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        Optional<User> user = userService.getUserByEmail(loginRequest.getEmail());
+        
+        if (!user.isPresent()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Invalid email or password"));
+        }
+        
+        User foundUser = user.get();
+        // Verify password using BCrypt
+        if (!passwordEncoder.matches(loginRequest.getPassword(), foundUser.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Invalid email or password"));
+        }
+        
+        if (!foundUser.getActive()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("User account is inactive"));
+        }
+        
+        String token = jwtTokenProvider.generateToken(foundUser.getEmail(), foundUser.getId());
+        
+        LoginResponse response = new LoginResponse(
+                token,
+                foundUser.getId(),
+                foundUser.getEmail(),
+                foundUser.getFirstName(),
+                foundUser.getLastName(),
+                foundUser.getRole().toString()
+        );
+        
+        return ResponseEntity.ok(response);
     }
-
-    User foundUser = user.get();
-
-    System.out.println("EMAIL = " + loginRequest.getEmail());
-    System.out.println("PASSWORD = " + loginRequest.getPassword());
-    System.out.println("DB HASH = " + foundUser.getPassword());
-
-  System.out.println(passwordEncoder.encode("123456"));
-
-System.out.println(
-    passwordEncoder.matches(
-        "123456",
-        "$2a$10$rNC8f5OX8gr5PXh3Gma2a.RjsOjzeyzxUYj1qR.YQNFRoxWE9wRCG"
-    )
-);
-
-boolean match = passwordEncoder.matches(
-    loginRequest.getPassword(),
-    foundUser.getPassword()
-);
-
-    System.out.println("MATCH = " + match);
-
-    if (!match) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorResponse("Invalid email or password"));
-    }
-
-    String token = jwtTokenProvider.generateToken(foundUser.getEmail(), foundUser.getId());
-
-    LoginResponse response = new LoginResponse(
-            token,
-            foundUser.getId(),
-            foundUser.getEmail(),
-            foundUser.getFirstName(),
-            foundUser.getLastName(),
-            foundUser.getRole().toString()
-    );
-
-    return ResponseEntity.ok(response);
-}
+    
     @GetMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -112,40 +95,39 @@ boolean match = passwordEncoder.matches(
         return ResponseEntity.ok(new TokenValidationResponse(true, email, userId));
     }
     
-   
-   public static class ErrorResponse {
-    public String message;
-
-    public ErrorResponse(String message) {
-        this.message = message;
+    public static class ErrorResponse {
+        public String message;
+        
+        public ErrorResponse(String message) {
+            this.message = message;
+        }
+        
+        public String getMessage() {
+            return message;
+        }
     }
-
-    public String getMessage() {
-        return message;
+    
+    public static class TokenValidationResponse {
+        public boolean valid;
+        public String email;
+        public Long userId;
+        
+        public TokenValidationResponse(boolean valid, String email, Long userId) {
+            this.valid = valid;
+            this.email = email;
+            this.userId = userId;
+        }
+        
+        public boolean isValid() {
+            return valid;
+        }
+        
+        public String getEmail() {
+            return email;
+        }
+        
+        public Long getUserId() {
+            return userId;
+        }
     }
-}
-
-public static class TokenValidationResponse {
-    public boolean valid;
-    public String email;
-    public Long userId;
-
-    public TokenValidationResponse(boolean valid, String email, Long userId) {
-        this.valid = valid;
-        this.email = email;
-        this.userId = userId;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-}
 }
