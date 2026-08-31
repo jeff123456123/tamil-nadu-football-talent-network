@@ -321,17 +321,29 @@
                     showError('Failed to create user account');
                     return;
                 }
-                
-                const user = await userResponse.json();
-                
-                // Create player profile
+
+                // Auth response contains token and userId (auto-login)
+                const auth = await userResponse.json();
+
+                // Store token and user info similar to login
+                localStorage.setItem('token', auth.token);
+                localStorage.setItem('user', JSON.stringify({
+                    id: auth.userId,
+                    email: auth.email,
+                    firstName: auth.firstName,
+                    lastName: auth.lastName,
+                    role: auth.role
+                }));
+
+                // Create player profile (include Authorization header)
                 const playerResponse = await fetch('/api/players', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + auth.token
                     },
                     body: JSON.stringify({
-                        user: { id: user.id },
+                        user: { id: auth.userId },
                         district: { id: district },
                         playerLevel: { id: playerLevel },
                         dateOfBirth: dateOfBirth,

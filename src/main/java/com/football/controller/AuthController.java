@@ -37,7 +37,20 @@ public class AuthController {
             user.setRole(User.UserRole.PLAYER);
         }
         User registeredUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
+
+        // Generate JWT for the newly registered user (auto-login)
+        String token = jwtTokenProvider.generateToken(registeredUser.getEmail(), registeredUser.getId());
+
+        LoginResponse response = new LoginResponse(
+                token,
+                registeredUser.getId(),
+                registeredUser.getEmail(),
+                registeredUser.getFirstName(),
+                registeredUser.getLastName(),
+                registeredUser.getRole().toString()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
     @PostMapping("/login")
